@@ -1,24 +1,24 @@
-use euclid::default::{Point3D, Vector3D};
+use crate::algebra::{Point, Vector};
 
 pub struct Ray {
-    origin: Point3D<f32>,
-    direction: Vector3D<f32>,
+    origin: Point,
+    direction: Vector,
 }
 
 impl Ray {
-    pub fn new(origin: Point3D<f32>, direction: Vector3D<f32>) -> Ray {
+    pub fn new(origin: Point, direction: Vector) -> Ray {
         Ray { origin, direction }
     }
 
-    pub fn at(&self, t: f32) -> Point3D<f32> {
+    pub fn at(&self, t: f32) -> Point {
         self.origin + self.direction * t
     }
 
-    pub fn origin(&self) -> Point3D<f32> {
+    pub fn origin(&self) -> Point {
         self.origin
     }
 
-    pub fn direction(&self) -> Vector3D<f32> {
+    pub fn direction(&self) -> Vector {
         self.direction
     }
 }

@@ -502,6 +502,7 @@ dependencies = [
  "euclid",
  "image",
  "rand",
+ "rayon",
 ]
 
 [[package]]

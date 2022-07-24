@@ -1,15 +1,19 @@
 use crate::Ray;
-use euclid::default::{Point3D, Vector3D};
+use std::sync::Arc;
+
+use crate::algebra::{Point, Vector};
+use crate::material::Material;
 
 pub struct HitRecord {
-    p: Point3D<f32>,
-    normal: Vector3D<f32>,
-    t: f32,
-    front_face: bool,
+    pub p: Point,
+    pub normal: Vector,
+    pub t: f32,
+    pub front_face: bool,
+    pub material: Arc<dyn Material>,
 }
 
 impl HitRecord {
-    pub fn new(normal: Vector3D<f32>, t: f32, ray: &Ray) -> HitRecord {
+    pub fn new(normal: Vector, t: f32, ray: &Ray, material: Arc<dyn Material>) -> HitRecord {
         let normal = normal.normalize();
         let p = ray.at(t);
         let front_face = normal.dot(ray.direction()) < 0.0;
@@ -19,22 +23,24 @@ impl HitRecord {
             normal,
             t,
             front_face,
+            material,
         }
-    }
-
-    pub fn normal(&self) -> Vector3D<f32> {
-        self.normal
     }
 }
 
 pub struct Sphere {
-    center: Point3D<f32>,
+    center: Point,
     radius: f32,
+    material: Arc<dyn Material + Send + Sync>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3D<f32>, radius: f32) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Point, radius: f32, material: Arc<dyn Material + Send + Sync>) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -61,7 +67,7 @@ impl Hittable for Sphere {
         let t = root;
         let p = ray.at(t);
         let normal = (p - self.center) / self.radius;
-        Some(HitRecord::new(normal, t, ray))
+        Some(HitRecord::new(normal, t, ray, self.material.clone()))
     }
 }
 
@@ -70,7 +76,7 @@ pub trait Hittable {
 }
 
 pub struct HittableCollection {
-    list: Vec<Box<dyn Hittable>>,
+    list: Vec<Box<dyn Hittable + Send + Sync>>,
 }
 
 impl HittableCollection {
@@ -78,7 +84,7 @@ impl HittableCollection {
         HittableCollection { list: Vec::new() }
     }
 
-    pub fn add(&mut self, hittable: Box<dyn Hittable>) {
+    pub fn add(&mut self, hittable: Box<dyn Hittable + Send + Sync>) {
         self.list.push(hittable);
     }
 }

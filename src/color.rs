@@ -1,5 +1,6 @@
+use crate::algebra;
 use image::Rgb;
-use std::ops::AddAssign;
+use std::ops::{AddAssign, Mul};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {
@@ -29,6 +30,10 @@ impl Color {
         Color::new(red, green, blue)
     }
 
+    pub fn gamma_correct(&self) -> Color {
+        Color::new(self.red.sqrt(), self.green.sqrt(), self.blue.sqrt())
+    }
+
     pub fn as_image_color(&self) -> Rgb<u8> {
         let red = self.red.min(1.0).max(0.0) * 255.0;
         let green = self.green.min(1.0).max(0.0) * 255.0;
@@ -43,6 +48,30 @@ impl AddAssign for Color {
         self.red += other.red;
         self.green += other.green;
         self.blue += other.blue;
+    }
+}
+
+impl Mul<algebra::Scalar> for Color {
+    type Output = Color;
+
+    fn mul(self, other: algebra::Scalar) -> Color {
+        Color {
+            red: self.red * other,
+            green: self.green * other,
+            blue: self.blue * other,
+        }
+    }
+}
+
+impl Mul<Color> for Color {
+    type Output = Color;
+
+    fn mul(self, other: Color) -> Color {
+        Color {
+            red: self.red * other.red,
+            green: self.green * other.green,
+            blue: self.blue * other.blue,
+        }
     }
 }
 

@@ -1,11 +1,12 @@
+use crate::algebra::{Point, Vector};
 use crate::Ray;
 use euclid::default::{Point3D, Vector3D};
 
 pub struct Camera {
-    origin: Point3D<f32>,
-    lower_left_corner: Point3D<f32>,
-    horizontal: Vector3D<f32>,
-    vertical: Vector3D<f32>,
+    origin: Point,
+    lower_left_corner: Point,
+    horizontal: Vector,
+    vertical: Vector,
 }
 
 impl Camera {
